@@ -1,1 +1,0 @@
-hello this is nothing but statically diaplyaed files using express very simple
