@@ -43,7 +43,7 @@ const Uploader = () => {
     defaultValues: {
       code: "",
       fileInput: {
-        file: "", // Set default file data if needed
+        file: "",
       },
     },
   });

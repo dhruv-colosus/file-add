@@ -29,7 +29,7 @@ const Tice: React.FC = () => {
         {
           headers: {
             "Content-Type": "multipart/form-data",
-            code: code, // Assuming you want to pass the code in headers
+            code: code,
           },
         }
       );
@@ -43,10 +43,8 @@ const Tice: React.FC = () => {
 
       if (response.ok) {
         console.log("File uploaded successfully");
-        // Handle success, e.g., show a success message to the user
       } else {
         console.error("File upload failed");
-        // Handle failure, e.g., show an error message to the user
       }
     } catch (error) {
       console.error("Error uploading file:", error);
