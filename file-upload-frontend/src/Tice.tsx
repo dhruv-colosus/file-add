@@ -41,7 +41,7 @@ const Tice: React.FC = () => {
       //     },
       //   });
 
-      if (response.ok) {
+      if (response) {
         console.log("File uploaded successfully");
       } else {
         console.error("File upload failed");

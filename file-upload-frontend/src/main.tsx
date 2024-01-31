@@ -8,6 +8,7 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import Uploader from "./Uploader.tsx";
 import Display from "./Display.tsx";
 import Tice from "./Tice.tsx";
+import { Toaster } from "./@/components/ui/toaster";
 
 const router = createBrowserRouter([
   {
@@ -32,5 +33,6 @@ const router = createBrowserRouter([
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <RouterProvider router={router} />
+    <Toaster />
   </React.StrictMode>
 );

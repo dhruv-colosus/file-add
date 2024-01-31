@@ -1,141 +1,117 @@
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
-import { Label } from "./@/components/ui/label";
-import { Button } from "./@/components/ui/button";
+import React, { useState, ChangeEvent, FormEvent } from "react";
 import axios from "axios";
+import { useToast } from "./@/components/ui/use-toast";
 
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "./@/components/ui/form";
+const Uploader: React.FC = () => {
+  const { toast } = useToast();
 
-import { Input } from "./@/components/ui/input";
+  const [code, setCode] = useState<string>("");
+  const [file, setFile] = useState<File | null>(null);
 
-const formSchema = z.object({
-  code: z.string().min(2, {
-    message: "Code must be at least 2 characters.",
-  }),
-  fileInput: z
-    .object({
-      file: z.string().refine(
-        (data) => {
-          // Assuming "data" is a Buffer or a similar type representing the file data
-          return data.length > 0; // Adjust the condition as needed
-        },
-        {
-          message: "File is required.",
-        }
-      ),
-    })
-    .refine((data) => !!data, {
-      message: "File is required.",
-    }),
-});
+  const handleCodeChange = (event: ChangeEvent<HTMLInputElement>) => {
+    setCode(event.target.value);
+  };
 
-const Uploader = () => {
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      code: "",
-      fileInput: {
-        file: "",
-      },
-    },
-  });
+  const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const selectedFile = event.target.files?.[0];
+    setFile(selectedFile || null);
+  };
 
-  // 2. Define a submit handler.
-  const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    console.log("hello");
+  const handleSubmit = async (event: FormEvent) => {
+    event.preventDefault();
+
     try {
       const formData = new FormData();
-      //   formData.append("textInput", values.code);
-      formData.append("file", values.fileInput.file.toString());
-      console.log(values.fileInput.file);
 
+      if (file) {
+        formData.append("file", file);
+      }
       const response = await axios.post(
         `http://localhost:8000/api/upload`,
         formData,
         {
           headers: {
             "Content-Type": "multipart/form-data",
-            code: values.code, // Assuming you want to pass the code in headers
+            code: code,
           },
         }
       );
-      //  const response = await fetch("http://localhost:8000/api/upload", {
-      //    method: "POST",
-      //    body: formData,
-      //    headers: {
-      //      code: values.code,
-      //    },
-      //  });
+      //   const response = await fetch("http://localhost:8000/api/upload", {
+      //     method: "POST",
+      //     body: formData,
+      //     headers: {
+      //       code: code,
+      //     },
+      //   });
 
-      console.log(response.data);
+      if (response.status === 200) {
+        console.log("File uploaded successfully");
+        toast({
+          title: "File Uploaded Successfully",
+          description: `${file?.name} has been uploaded to the server `,
+          variant: "success",
+        });
+        setCode("");
+        setFile(null);
+      } else {
+        console.error("File upload failed");
+        toast({
+          title: "File Upload Failed",
+          description: "Failed due to internal server error",
+          variant: "destructive",
+        });
+      }
     } catch (error) {
-      console.error("Error submitting form:", error);
+      if (axios.isAxiosError(error)) {
+        console.error("Axios error message:", error.response?.data.message);
+        toast({
+          title: error.response?.data.message,
+          description: "Failure you are very bad !!",
+          variant: "destructive",
+        });
+      } else {
+        console.error("Non-Axios error:", error);
+      }
     }
-    console.log(values);
   };
-  return (
-    <>
-      <div className="bg-zinc-950 font-main text-gray-100 font-medium dark:bg-white h-[100vh] w-[100vw] flex justify-center align-middle text-center items-center flex-col">
-        <Form {...form}>
-          <form
-            onSubmit={form.handleSubmit(onSubmit)}
-            className="space-y-8 border-[1px] border-slate-300 py-16 px-8 border-opacity-30 rounded-md"
-          >
-            <FormField
-              control={form.control}
-              name="code"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Entry Code</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Enter Your Code" {...field} />
-                  </FormControl>
 
-                  {/* <div className="flex flex-row w-full max-w-sm items-center gap-5 mt-16">
-                    <div className=" min-w-[5rem]">
-                      <Label htmlFor="picture">Upload File</Label>
-                    </div>
-                    <Input id="picture" type="file" />
-                  </div> */}
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="fileInput.file"
-              render={({ field }) => (
-                <FormItem>
-                  <div className="flex flex-row w-full max-w-sm items-center gap-5 mt-2">
-                    <Label htmlFor="fileInput.file">Upload File</Label>
-                    <Input
-                      id="fileInput.file"
-                      type="file"
-                      {...field}
-                      //   onChange={(e) => {
-                      //     field.onChange(e); // Trigger the field's onChange
-                      //     form.setValue("fileInput.file", e.target.files[0]); // Manually set the field value
-                      //   }}
-                    />
-                  </div>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <Button type="submit">Submit</Button>
-          </form>
-        </Form>
-      </div>
-    </>
+  return (
+    <div className="flex min-h-screen w-full justify-center items-center text-gray-100 bg-black bg-opacity-95 ">
+      <form
+        onSubmit={handleSubmit}
+        className="border-[1px] px-8 py-10 rounded-md border-opacity-20 border-gray-300 flex flex-col gap-2 "
+      >
+        <label>
+          <h1 className="mb-2 font-semibold">Code:</h1>
+          <input
+            type="text"
+            value={code}
+            onChange={handleCodeChange}
+            placeholder="******"
+            className="border-[1px] rounded-md border-opacity-20 border-gray-300 focus:outline-none p-2 text-[16px] bg-black bg-opacity-95 text-gray-500 font-medium w-full "
+          />
+        </label>
+        <br />
+
+        <input
+          type="file"
+          onChange={handleFileChange}
+          className="border-[1px] rounded-md border-opacity-20 border-gray-300 focus:outline-none p-2 text-[16px] text-gray-500 font-medium w-full  file:mr-4 file:py-2 file:px-4 file:rounded-md
+        file:border-0 file:text-sm file:font-semibold
+        file:bg-pink-50 file:text-pink-700
+        hover:file:bg-pink-100 cursor-pointer"
+        />
+        <br />
+        <button
+          type="submit"
+          className="flex flex-col bg-pink-50 text-pink-700 hover:bg-pink-200 transition-100 cursor-pointer border-[1px] text-[14px] font-medium rounded-md border-opacity-20 border-gray-300 w-24 p-2 items-center justify-center"
+        >
+          Submit
+        </button>
+      </form>
+    </div>
   );
 };
 
 export default Uploader;
+// class="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400"
