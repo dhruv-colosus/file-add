@@ -1,9 +1,11 @@
-import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
 const Display = () => {
-  const [data, setData] = useState([]);
-  let navigate = useNavigate();
-
+  const [data, setData] = useState<FileData[]>([]);
+  interface FileData {
+    name: string;
+    realname: string;
+    // Add other properties if they exist in your data
+  }
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -22,7 +24,7 @@ const Display = () => {
 
     fetchData();
   }, []);
-  const handleClick = async (realname) => {
+  const handleClick = async (realname: string) => {
     try {
       window.open(`http://localhost:8000/api/files/${realname}`);
     } catch (error) {
