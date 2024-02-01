@@ -26,6 +26,7 @@ const Uploader: React.FC = () => {
       if (file) {
         formData.append("file", file);
       }
+      //  const apiUrl = import.meta.env.api;
       const response = await axios.post(
         `http://localhost:8000/api/upload`,
         formData,
