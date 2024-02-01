@@ -11,9 +11,7 @@ const Display = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(
-          `http://http://20.89.176.39/:8000/api/files`
-        );
+        const response = await fetch(`http://20.89.176.39:8000/api/files`);
         const result = await response.json();
 
         setData(result);
