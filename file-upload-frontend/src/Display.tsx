@@ -11,7 +11,9 @@ const Display = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(`http://localhost:8000/api/files`);
+        const response = await fetch(
+          `http://http://20.89.176.39/:8000/api/files`
+        );
         const result = await response.json();
 
         setData(result);
@@ -26,7 +28,7 @@ const Display = () => {
   }, []);
   const handleClick = async (realname: string) => {
     try {
-      window.open(`http://localhost:8000/api/files/${realname}`);
+      window.open(`http://20.89.176.39:8000/api/files/${realname}`);
     } catch (error) {
       console.error("Error fetching data:", error);
       setLoading(false);

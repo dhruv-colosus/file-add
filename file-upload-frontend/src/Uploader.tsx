@@ -28,7 +28,7 @@ const Uploader: React.FC = () => {
       }
       //  const apiUrl = import.meta.env.api;
       const response = await axios.post(
-        `http://localhost:8000/api/upload`,
+        `http://20.89.176.39/api/upload`,
         formData,
         {
           headers: {
